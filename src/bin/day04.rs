@@ -32,8 +32,10 @@ fn main() -> Result<()> {
         boards.last_mut().unwrap().append(&mut board_line);
     }
 
+    let mut win_order: Vec<usize> = Vec::new();
+    let number_of_boards = boards.len();
     'outer: for n in numbers {
-        for board in &mut boards {
+        for (board_idx, board) in (&mut boards).iter_mut().enumerate() {
             let idx = board.iter().position(|e| e == &(n, false));
             if idx.is_none() {
                 continue;
@@ -42,8 +44,6 @@ fn main() -> Result<()> {
             board[idx.unwrap()] = (n, true);
 
             if is_bingo(board) {
-                println!("{}", n);
-                pretty_print(board);
                 let unmarked_sum: u32 = board
                     .iter()
                     .filter_map(|(e, b)| match b {
@@ -51,12 +51,33 @@ fn main() -> Result<()> {
                         false => Some(*e as u32),
                     })
                     .sum();
-                println!(
-                    "Sum of unmarked: {}, product: {}",
-                    unmarked_sum,
-                    unmarked_sum * (n as u32)
-                );
-                break 'outer;
+
+                if win_order.is_empty() {
+                    pretty_print(board);
+                    println!(
+                        "Part 1: n: {}, sum of unmarked: {}, product: {}",
+                        n,
+                        unmarked_sum,
+                        unmarked_sum * (n as u32)
+                    );
+                }
+
+                if !win_order.contains(&board_idx) {
+                    win_order.push(board_idx);
+                }
+
+                if win_order.len() == number_of_boards {
+                    println!();
+                    pretty_print(board);
+                    println!(
+                        "Part 2: n: {}, sum of unmarked: {}, product: {}",
+                        n,
+                        unmarked_sum,
+                        unmarked_sum * (n as u32)
+                    );
+
+                    break 'outer;
+                }
             }
         }
     }
