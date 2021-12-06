@@ -10,15 +10,8 @@ fn main() -> Result<()> {
     let fish_arr: Vec<u8> = line.split(',').map(|e| e.parse::<u8>().unwrap()).collect();
     let mut fish: HashMap<u8, u64> = HashMap::new();
 
-    // TODO: Find a better way to do it
     for f in 0..=8 {
-        let mut count = 0;
-        for i in &fish_arr {
-            if *i == f {
-                count += 1;
-            }
-        }
-        fish.insert(f, count);
+        fish.insert(f, *&fish_arr.iter().filter(|e| **e == f).count() as u64);
     }
 
     let days = 256;
