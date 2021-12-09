@@ -1,4 +1,5 @@
 use anyhow::Result;
+use std::collections::{HashMap, HashSet, VecDeque};
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 
@@ -26,8 +27,7 @@ fn main() -> Result<()> {
     let mut part1_result = 0;
 
     for (idx, val) in map.iter().enumerate() {
-        let x = idx as i16 % width;
-        let y = idx as i16 / width;
+        let (x, y) = index_to_coordinates(idx, width, height);
         let mut found = true;
 
         for diff in diffs {
@@ -47,7 +47,46 @@ fn main() -> Result<()> {
         }
     }
 
+    let mut basin_sizes = Vec::new();
+
+    for idx in low_point_indices.iter() {
+        let idx = *idx;
+        let mut basin_size = 0;
+        let mut seen: HashSet<usize> = HashSet::new();
+        let mut queue = VecDeque::new();
+        queue.push_back(idx);
+        seen.insert(idx);
+
+        while !queue.is_empty() {
+            let next_idx = queue.pop_front().unwrap();
+            basin_size += 1;
+            let (x, y) = index_to_coordinates(next_idx, width, height);
+
+            for diff in diffs {
+                let x1 = x + diff.0;
+                let y1 = y + diff.1;
+                if are_valid_coordinates(width, height, x1, y1)
+                    && !seen.contains(&((y1 * width + x1) as usize))
+                    && *&map[(y1 * width + x1) as usize] != 9
+                {
+                    queue.push_back((y1 * width + x1) as usize);
+                    seen.insert((y1 * width + x1) as usize);
+                }
+            }
+        }
+
+        basin_sizes.push(basin_size);
+    }
+
+    basin_sizes.sort();
+
     println!("Part 1: {}", part1_result);
+    println!(
+        "Part 2: {:?}",
+        basin_sizes[basin_sizes.len() - 1]
+            * basin_sizes[basin_sizes.len() - 2]
+            * basin_sizes[basin_sizes.len() - 3]
+    );
 
     Ok(())
 }
@@ -60,4 +99,10 @@ fn are_valid_coordinates(width: i16, height: i16, x: i16, y: i16) -> bool {
         return false;
     }
     true
+}
+
+fn index_to_coordinates(idx: usize, width: i16, height: i16) -> (i16, i16) {
+    let x = idx as i16 % width;
+    let y = idx as i16 / width;
+    (x, y)
 }
