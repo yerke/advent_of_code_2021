@@ -30,10 +30,14 @@ fn main() -> Result<()> {
         (-1, 0),
     ];
 
+    let mut part1_number_of_flashes = 0;
     let mut number_of_flashes = 0;
 
     let steps = 100;
-    for step in 0..steps {
+    let mut step = 0;
+
+    loop {
+        step += 1;
         // just increment all
         for i in 0..matrix.len() {
             matrix[i] += 1;
@@ -41,9 +45,9 @@ fn main() -> Result<()> {
 
         // check for flashes
         let mut flashed: Vec<bool> = vec![false; matrix.len()];
-        let mut got_flash = false;
 
         loop {
+            let mut got_flash = false;
             for i in 0..matrix.len() {
                 if flashed[i] {
                     continue;
@@ -76,15 +80,23 @@ fn main() -> Result<()> {
                 }
                 break;
             }
-
-            got_flash = false;
         }
 
         // println!("step: {}", step);
         // pretty_print(&matrix, width, height);
+
+        if step == steps {
+            part1_number_of_flashes = number_of_flashes;
+        }
+
+        let number_of_flashes_during_step = flashed.iter().filter(|&&e| e).count();
+        if number_of_flashes_during_step == matrix.len() {
+            println!("Part 2: {}", step);
+            break;
+        }
     }
 
-    println!("Part 1: {}", number_of_flashes);
+    println!("Part 1: {}", part1_number_of_flashes);
 
     Ok(())
 }
