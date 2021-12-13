@@ -8,8 +8,6 @@ fn main() -> Result<()> {
 
     let mut paper = HashSet::new();
     let mut fold_instructions: Vec<(String, u16)> = Vec::new();
-    let mut max_x = 0;
-    let mut max_y = 0;
 
     for line in file.lines() {
         let line = line?;
@@ -29,21 +27,18 @@ fn main() -> Result<()> {
         let parts: Vec<u16> = line.split(',').map(|n| n.parse().unwrap()).collect();
         let (x, y) = (parts[0], parts[1]);
         paper.insert((x, y));
-
-        max_x = max_x.max(x);
-        max_y = max_y.max(y);
     }
 
-    println!("paper: {:?}", &paper);
-    println!("max_x: {}", max_x);
-    println!("max_y: {}", max_y);
-    println!("fold_instructions: {:?}", &fold_instructions);
+    for (idx, instruction) in fold_instructions.iter().enumerate() {
+        paper = fold(&paper, instruction);
 
-    println!("Dots before: {}", paper.len());
+        if idx == 0 {
+            println!("Parts 1: number of dots after 1 fold: {}", paper.len());
+        }
+    }
 
-    let new_paper = fold(&paper, &fold_instructions[0]);
-
-    println!("Dots after: {}", new_paper.len());
+    println!("Part 2 answer:");
+    pretty_print(&paper);
 
     Ok(())
 }
@@ -70,4 +65,20 @@ fn fold(paper: &HashSet<(u16, u16)>, instruction: &(String, u16)) -> HashSet<(u1
     }
 
     new_paper
+}
+
+fn pretty_print(paper: &HashSet<(u16, u16)>) {
+    let max_x = *&paper.iter().fold(0, |max_x, (x, _y)| max_x.max(*x));
+    let max_y = *&paper.iter().fold(0, |max_y, (_x, y)| max_y.max(*y));
+
+    for y in 0..=max_y {
+        for x in 0..=max_x {
+            if paper.contains(&(x, y)) {
+                print!(".");
+            } else {
+                print!(" ");
+            }
+        }
+        println!();
+    }
 }
