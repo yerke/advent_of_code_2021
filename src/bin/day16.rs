@@ -1,6 +1,6 @@
 use anyhow::Result;
 use std::fs::File;
-use std::io::{BufRead, BufReader, Read};
+use std::io::{BufRead, BufReader};
 
 fn main() -> Result<()> {
     let file = BufReader::new(File::open("data/day16.txt")?);
@@ -20,8 +20,13 @@ fn main() -> Result<()> {
 
     println!("{:?}", &bits);
 
-    let version = get_version(&bits);
+    let mut iter = bits.iter();
+
+    let version = read_3_bits(iter.by_ref());
     dbg!(version);
+
+    let type_id = read_3_bits(iter.by_ref());
+    dbg!(type_id);
 
     Ok(())
 }
@@ -48,8 +53,8 @@ fn hex_to_bits(hex: u8) -> Vec<u8> {
     }
 }
 
-fn get_version(data: &[u8]) -> u8 {
-    let bits: Vec<u8> = data.iter().take(3).cloned().collect();
+fn read_3_bits<'a>(data: impl Iterator<Item = &'a u8>) -> u8 {
+    let bits: Vec<u8> = data.take(3).cloned().collect();
     assert_eq!(bits.len(), 3);
 
     bits_to_u8(&bits)
