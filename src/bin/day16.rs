@@ -20,7 +20,7 @@ fn main() -> Result<()> {
 
     println!("{:?}", &bits);
 
-    let mut iter = bits.iter();
+    let mut iter = bits.into_iter();
 
     let version = read_3_bits(iter.by_ref());
     dbg!(version);
@@ -53,8 +53,8 @@ fn hex_to_bits(hex: u8) -> Vec<u8> {
     }
 }
 
-fn read_3_bits<'a>(data: impl Iterator<Item = &'a u8>) -> u8 {
-    let bits: Vec<u8> = data.take(3).cloned().collect();
+fn read_3_bits(data: impl Iterator<Item = u8>) -> u8 {
+    let bits: Vec<u8> = data.into_iter().take(3).collect();
     assert_eq!(bits.len(), 3);
 
     bits_to_u8(&bits)
