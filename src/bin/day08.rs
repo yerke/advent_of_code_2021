@@ -5,7 +5,7 @@ use std::io::{BufRead, BufReader};
 fn main() -> Result<()> {
     let file = BufReader::new(File::open("data/day08.txt")?);
 
-    let mut counter = 0;
+    let mut counter_part1 = 0;
 
     for line in file.lines() {
         let line = line?;
@@ -19,12 +19,12 @@ fn main() -> Result<()> {
 
         for segment in segments {
             if unique_lengths.contains(&segment.len()) {
-                counter += 1;
+                counter_part1 += 1;
             }
         }
     }
 
-    println!("Part 1: {}", counter);
+    println!("Part 1: {}", counter_part1);
 
     Ok(())
 }
